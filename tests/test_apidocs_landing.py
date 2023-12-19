@@ -42,6 +42,20 @@ def clear_search(page: Page):
     page.get_by_placeholder("Find by product or service").clear()
 
 
+def select_checkbox(page: Page, checkbox_labels: list[str]):
+    """ Select the checkboxes with the provided label text """
+    for checkbox_lbl in checkbox_labels:
+        page.locator("label").filter(has_text=checkbox_lbl).set_checked(True)
+
+
+def clear_checkboxes(page: Page):
+    """ Ensure all the checkboxes are unchecked """
+    all_checkboxes = page.get_by_role('checkbox')
+    checkbox_count = all_checkboxes.count()
+    for i in range(0, checkbox_count):
+        all_checkboxes.nth(i).set_checked(False)
+
+
 def test_landing_navigation(page: Page):
     """Verify that we can navigate to the API docs page and load a specific API doc"""
     navigate_to_landing(page)
@@ -74,7 +88,11 @@ def test_clear_search_filter(page: Page):
 
 def test_checkbox_selection(page: Page):
     """Verify that if a checkbox is selected only appropriate cards are shown"""
-    pass
+    navigate_to_landing(page)
+    select_checkbox(page, ["Automation", "Deploy"])
+    assert card_count(page) == 6
+    clear_checkboxes(page)
+    assert card_count(page) == 12
 
 
 def test_nav_menu_presence(page: Page):
