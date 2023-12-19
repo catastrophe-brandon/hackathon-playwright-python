@@ -6,6 +6,7 @@ LANDING_URL = "https://developers.redhat.com/api-catalog/"
 
 
 def navigate_to_landing(page: Page):
+    page.set_viewport_size({"width": 1000, "height": 600})
     page.goto(LANDING_URL)
     expect(page).to_have_title("Home | API Catalog and Documentation")
     # Dismiss the pop-up
@@ -97,5 +98,9 @@ def test_checkbox_selection(page: Page):
 
 def test_nav_menu_presence(page: Page):
     """Verify that the nav menu appears when clicked and has the right headings"""
-    pass
+    navigate_to_landing(page)
+    page.get_by_role("button", name="Menu").click()     
+    expected_buttons = ["Products", "Technologies", "Learn", "Events", "Developer Sandbox"]
+    for some_button in expected_buttons:
+        expect(page.get_by_role("button", name=some_button)).to_be_visible()
 
