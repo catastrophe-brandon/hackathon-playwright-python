@@ -83,8 +83,8 @@ def test_clear_search_filter(page: Page):
     search_for(page, "Hamburger")
     assert card_count(page) == 0
     clear_search(page)
-    # By default 12 cards are displayed
-    assert card_count(page) == 12
+    # By default 10 cards are displayed
+    assert card_count(page) == 10
 
 
 def test_checkbox_selection(page: Page):
@@ -93,7 +93,8 @@ def test_checkbox_selection(page: Page):
     select_checkbox(page, ["Automation", "Deploy"])
     assert card_count(page) == 6
     clear_checkboxes(page)
-    assert card_count(page) == 12
+    # at this viewport, the expected card count is 10 of 42
+    assert card_count(page) == 10
 
 
 def test_nav_menu_presence(page: Page):
