@@ -1,9 +1,11 @@
 import re
 from playwright.sync_api import Page, expect
 
+#=== Constants and Variables ===
 
 LANDING_URL = "https://developers.redhat.com/api-catalog/"
 
+#=== Helper Functions ===
 
 def navigate_to_landing(page: Page):
     page.set_viewport_size({"width": 1000, "height": 600})
@@ -57,6 +59,25 @@ def clear_checkboxes(page: Page):
         all_checkboxes.nth(i).set_checked(False)
 
 
+def table_view(page: Page):
+    page.get_by_label("Table display").click()
+
+
+def card_view(page: Page):
+    page.get_by_label("Show card view").click()
+
+
+def table_count(page: Page):
+    all_table_rows = page.get_by_role('row')
+    return all_table_rows.count() - 1
+
+
+def table_row_matching(page: Page, search_phrase: str):
+    return page.get_by_role('row', name=search_phrase)
+
+
+#=== Tests Below Here ===
+
 def test_landing_navigation(page: Page):
     """Verify that we can navigate to the API docs page and load a specific API doc"""
     navigate_to_landing(page)
@@ -104,4 +125,29 @@ def test_nav_menu_presence(page: Page):
     expected_buttons = ["Products", "Technologies", "Learn", "Events", "Developer Sandbox"]
     for some_button in expected_buttons:
         expect(page.get_by_role("button", name=some_button)).to_be_visible()
+
+
+def test_table_view(page: Page):
+    """Verify that the table view works with search and checkboxes"""
+    navigate_to_landing(page)
+    table_view(page)
+    search_for(page, "Insights")
+    assert table_count(page) == 2
+    search_for(page, "Omni Consumer Products")
+    assert table_count(page) == 0
+
+    clear_search(page)
+    select_checkbox(page, ["Inventories"])
+    assert table_count(page) == 2
+
+    clear_search(page)
+    clear_checkboxes(page)
+    select_checkbox(page, ["Edge"])
+    assert table_count(page) == 2
+
+    # Check for two expected matching results
+    expect(table_row_matching(page, "RHEL for Edge")).to_be_visible()
+    expect(table_row_matching(page, "Subscriptions")).to_be_visible()
+    
+
 
