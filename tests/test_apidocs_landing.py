@@ -1,11 +1,12 @@
 import re
 from playwright.sync_api import Page, expect
 
-#=== Constants and Variables ===
+# === Constants and Variables ===
 
 LANDING_URL = "https://developers.redhat.com/api-catalog/"
 
-#=== Helper Functions ===
+# === Helper Functions ===
+
 
 def navigate_to_landing(page: Page):
     page.set_viewport_size({"width": 1000, "height": 600})
@@ -16,7 +17,7 @@ def navigate_to_landing(page: Page):
 
 
 def visit_card(page: Page, cardName: str):
-    # css=article is required to disambiguate from the two matches 
+    # css=article is required to disambiguate from the two matches
     page.get_by_role("link", name=cardName).and_(page.locator("css=article")).click()
 
 
@@ -30,7 +31,7 @@ def visible_cards(page: Page):
     return page.locator("css=.pf-c-card").and_(page.locator("css=:visible"))
 
 
-def doc_page_title_exists(page: Page, doc_page_title:str):
+def doc_page_title_exists(page: Page, doc_page_title: str):
     expect(page.get_by_role("heading", name=doc_page_title)).to_be_visible()
     # expect doc_page_title to be in the page title
     expect(page).to_have_title(re.compile(doc_page_title))
@@ -46,14 +47,14 @@ def clear_search(page: Page):
 
 
 def select_checkbox(page: Page, checkbox_labels: list[str]):
-    """ Select the checkboxes with the provided label text """
+    """Select the checkboxes with the provided label text"""
     for checkbox_lbl in checkbox_labels:
         page.locator("label").filter(has_text=checkbox_lbl).set_checked(True)
 
 
 def clear_checkboxes(page: Page):
-    """ Ensure all the checkboxes are unchecked """
-    all_checkboxes = page.get_by_role('checkbox')
+    """Ensure all the checkboxes are unchecked"""
+    all_checkboxes = page.get_by_role("checkbox")
     checkbox_count = all_checkboxes.count()
     for i in range(0, checkbox_count):
         all_checkboxes.nth(i).set_checked(False)
@@ -68,15 +69,16 @@ def card_view(page: Page):
 
 
 def table_count(page: Page):
-    all_table_rows = page.get_by_role('row')
+    all_table_rows = page.get_by_role("row")
     return all_table_rows.count() - 1
 
 
 def table_row_matching(page: Page, search_phrase: str):
-    return page.get_by_role('row', name=search_phrase)
+    return page.get_by_role("row", name=search_phrase)
 
 
-#=== Tests Below Here ===
+# === Tests Below Here ===
+
 
 def test_landing_navigation(page: Page):
     """Verify that we can navigate to the API docs page and load a specific API doc"""
@@ -121,8 +123,14 @@ def test_checkbox_selection(page: Page):
 def test_nav_menu_presence(page: Page):
     """Verify that the nav menu appears when clicked and has the right headings"""
     navigate_to_landing(page)
-    page.get_by_role("button", name="Menu").click()     
-    expected_buttons = ["Products", "Technologies", "Learn", "Events", "Developer Sandbox"]
+    page.get_by_role("button", name="Menu").click()
+    expected_buttons = [
+        "Products",
+        "Technologies",
+        "Learn",
+        "Events",
+        "Developer Sandbox",
+    ]
     for some_button in expected_buttons:
         expect(page.get_by_role("button", name=some_button)).to_be_visible()
 
@@ -148,6 +156,3 @@ def test_table_view(page: Page):
     # Check for two expected matching results
     expect(table_row_matching(page, "RHEL for Edge")).to_be_visible()
     expect(table_row_matching(page, "Subscriptions")).to_be_visible()
-    
-
-
